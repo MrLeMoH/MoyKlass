@@ -37,7 +37,7 @@ Lesson.init(
         status: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            defaultValue: 0, // По умолчанию статус "не проведено"
+            defaultValue: 0,
         },
     },
     {
