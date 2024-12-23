@@ -77,40 +77,25 @@ app.post('/lessons', async (req: Request<{}, {}, FilterParams>, res: Response):P
                 return res.status(400).json({ error: 'Teacher ids must be numbers' });
             }
             teacherFilter = {
-                [Op.or]: teacherIdsArray.map((teacherId) => ({
-                    id: {
-                        [Op.eq]: Number(teacherId),
-                    },
-                })),
+                id: {
+                    [Op.in]: teacherIdsArray,
+                },
             };
         }
 
         // Проверка количества студентов
+        const having: any = {};
         let havingClause: WhereOptions | undefined = undefined;
-        if (studentsCount) {
-            const [minCount, maxCount] = studentsCount.split(',');
-            const min = Number(minCount);
-            const max = maxCount ? Number(maxCount) : min;
-            if (isNaN(min) || (maxCount && isNaN(Number(maxCount)))) {
-                return res.status(400).json({ error: 'Students count must be a valid number or range' });
-            }
-
-            havingClause = {
-                [Op.and]: [
-                    Sequelize.where(
-                        Sequelize.fn('COUNT', Sequelize.fn('DISTINCT', Sequelize.col('Students.id'))),
-                        {
-                            [Op.gte]: min,
-                        }
-                    ),
-                    Sequelize.where(
-                        Sequelize.fn('COUNT', Sequelize.fn('DISTINCT', Sequelize.col('Students.id'))),
-                        {
-                            [Op.lte]: max,
-                        }
-                    ),
-                ],
-            };
+        if (studentsCount !== undefined && studentsCount !== null) {
+            console.log("Не успел доделать")
+            // const studentsCountRange = String(studentsCount).split(',');
+            // if (studentsCountRange.length === 1) {
+            //     having.studentCount = Number(studentsCountRange[0]);
+            // } else if (studentsCountRange.length === 2) {
+            //     having.studentCount = { [Op.between]: studentsCountRange.map(Number) };
+            // } else {
+            //     return res.status(400).json({ error: 'Некорректный формат для studentsCount' });
+            // }
         }
 
         // Пагинация
@@ -125,16 +110,20 @@ app.post('/lessons', async (req: Request<{}, {}, FilterParams>, res: Response):P
                     model: Teacher,
                     through: { attributes: [] },
                     where: teacherFilter,
+                    required: teacherIds !== undefined,
                 },
                 {
                     model: Student,
                     through: { attributes: ['visit'] },
-                    required: true, // Это важно для корректного JOIN
+                    required: false,
                 },
             ],
+            // attributes: {
+            //     include: [[Sequelize.fn('COUNT', Sequelize.col('LessonStudents.id')), 'studentCount']],
+            // },
             order: ['id'],
             group: ['Lesson.id'], // Группировка по урокам
-            having: havingClause, // Применяем фильтрацию по количеству студентов
+            having, // Применяем фильтрацию по количеству студентов
             limit,
             offset,
         });
