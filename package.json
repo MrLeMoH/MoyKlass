@@ -1,0 +1,36 @@
+{
+  "name": "express-app",
+  "version": "1.0.0",
+  "description": "ExpressJS application with Sequelize",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "nodemon --watch src --ext ts --exec \"npm run build && node dist/index.js\""
+  },
+  "exports": {
+    "./models": "./dist/models/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "pg": "^8.13.1",
+    "sequelize": "^6.37.5",
+    "sequelize-typescript": "^2.1.6"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.2",
+    "@types/pg": "^8.11.10",
+    "nodemon": "^3.1.9",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.2"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
